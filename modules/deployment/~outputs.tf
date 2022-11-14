@@ -35,3 +35,23 @@ output cloudinit_rendered {
 output droplet_image {
   value = data.digitalocean_images.this.images.0
 }
+
+output volume_id {
+  value = var.volume_enabled ? digitalocean_volume.data[0].id : null
+}
+
+output volume_name {
+  value = var.volume_enabled ? digitalocean_volume.data[0].name : null
+}
+
+output volume_region {
+  value = var.volume_enabled ? digitalocean_volume.data[0].region : null
+}
+
+output volume_snapshot_id {
+  value = var.volume_enabled ? digitalocean_volume.data[0].snapshot_id : null
+}
+
+output volume_snapshot_filesystem_type {
+  value = var.volume_enabled ? digitalocean_volume.data[0].filesystem_type : null
+}
