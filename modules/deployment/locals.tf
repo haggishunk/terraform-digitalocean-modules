@@ -14,9 +14,8 @@ locals {
     var.tags,
   )
 
-  # remember max number of 5 tags ... keep them simple and sensibly scoped
-  # use the `access:` tag key
-  firewall_tags = ["access:${var.name}"]
+  firewall_tags        = ["protect:${local.name}"]
+  firewall_access_tags = ["access:${local.name}"]
 
   # ssh firewall controlled by `ssh:true` tag
   ssh_tags = var.ssh_enabled ? ["ssh:true"] : []

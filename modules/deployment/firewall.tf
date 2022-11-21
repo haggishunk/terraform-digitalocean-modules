@@ -9,7 +9,10 @@ resource "digitalocean_firewall" "this" {
       port_range       = inbound_rule.value.port_range
       protocol         = inbound_rule.value.protocol
       source_addresses = inbound_rule.value.source_addresses
-      source_tags      = inbound_rule.value.source_tags
+      source_tags = toset(concat(
+        inbound_rule.value.source_tags,
+        local.firewall_access_tags
+      ))
     }
   }
 
