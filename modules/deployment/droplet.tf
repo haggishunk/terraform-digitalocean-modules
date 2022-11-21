@@ -11,5 +11,6 @@ resource "digitalocean_droplet" "this" {
   tags = concat(
     local.tags,
     local.ssh_tags,
+    local.firewall_tags,
   )
 }
