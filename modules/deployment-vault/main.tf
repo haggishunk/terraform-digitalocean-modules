@@ -1,5 +1,5 @@
 module "deployment" {
-  source                      = "git::ssh://git@github.com/haggishunk/terraform-digitalocean-modules.git//modules/deployment?ref=firewall-tags-on-droplet"
+  source                      = "git::ssh://git@github.com/haggishunk/terraform-digitalocean-modules.git//modules/deployment?ref=1.2.1"
   ca_trust_enabled            = false # handled by cloudinit
   certs_enabled               = false # handled by cloudinit
   cloudinit_config_parts      = local.cloudinit_config_parts
