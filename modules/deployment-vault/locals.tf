@@ -27,7 +27,7 @@ locals {
             api_addr         = "127.0.0.1"
             tls_cert_b64     = var.tls_cert_b64
             tls_key_b64      = var.tls_key_b64
-            ca_cert_oneline  = var.ca_cert_oneline
+            ca_cert_b64      = var.ca_cert_b64
           },
         )
       }

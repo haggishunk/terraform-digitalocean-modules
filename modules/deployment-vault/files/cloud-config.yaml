@@ -1,6 +1,10 @@
 #cloud-config
 write_files:
 
+  - path: /tmp/ca/ca.crt
+    encoding: base64
+    content: ${ca_cert_b64}
+
   - path: /tmp/vault/tls.key
     encoding: base64
     content: ${tls_key_b64}
@@ -27,11 +31,6 @@ write_files:
       api_addr     = "http://${api_addr}:${https_port}"
       ui           = true
 
-ca_certs:
-  trusted:
-    - |-
-      ${ca_cert_oneline}
-
 ntp:
   enabled: true
   ntp_client: chrony
@@ -45,6 +44,8 @@ packages:
   - curl
 
 runcmd:
+  - "mv /tmp/ca/ca.crt /usr/local/share/ca-certificates/"
+  - "update-ca-certificates"
   - "curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -"
   - 'apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"'
   - "apt-get -y update"

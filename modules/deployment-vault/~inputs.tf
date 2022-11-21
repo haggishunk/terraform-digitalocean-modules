@@ -188,7 +188,7 @@ variable "tls_key" {
 
 variable "ca_cert" {
   type    = string
-  default = "DEFUNCT see `ca_cert_oneline`"
+  default = "DEFUNCT see `ca_cert_b64`"
 }
 
 variable "ca_trust_enabled" {
@@ -226,7 +226,7 @@ variable "tls_key_b64" {
   type = string
 }
 
-variable "ca_cert_oneline" {
+variable "ca_cert_b64" {
   type = string
 }
 
