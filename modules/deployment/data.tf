@@ -10,6 +10,11 @@ data "digitalocean_ssh_keys" "this" {
   }
 }
 
+data "digitalocean_tag" "this" {
+  for_each = toset(local.firewall_tags)
+  name     = each.value
+}
+
 data "digitalocean_images" "this" {
   # common-sense region selection
   filter {
