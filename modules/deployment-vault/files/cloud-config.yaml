@@ -1,0 +1,60 @@
+#cloud-config
+write_files:
+
+  - path: /tmp/vault/tls.key
+    encoding: base64
+    content: ${tls_key_b64}
+
+  - path: /tmp/vault/tls.crt
+    encoding: base64
+    content: ${tls_cert_b64}
+
+  - path: /tmp/vault/vault.hcl
+    content: |
+      storage "file" {
+        path = "${persistent_mount}"
+      }
+      listener "tcp" {
+        address       = "${https_addr}:${https_port}"
+        tls_cert_file = "/opt/vault/tls/tls.crt"
+        tls_key_file  = "/opt/vault/tls/tls.key"
+      }
+      telemetry "prometheus" {
+        prometheus_retention_time = "12h"
+        disable_hostname          = true
+      }
+      mlock        = true
+      api_addr     = "http://${api_addr}:${https_port}"
+      ui           = true
+
+ca_certs:
+  trusted:
+    - |-
+      ${ca_cert_oneline}
+
+ntp:
+  enabled: true
+  ntp_client: chrony
+
+# enable when clean boot up & config is sorted out
+package_update: false
+package_upgrade: false
+
+packages:
+  - software-properties-common
+  - curl
+
+runcmd:
+  - "curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -"
+  - 'apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"'
+  - "apt-get -y update"
+  - "apt-get -y install vault"
+  - "setcap cap_ipc_lock=+ep $(readlink -f $(which vault))"
+  - "mv /tmp/vault/tls.crt /opt/vault/tls/tls.crt"
+  - "mv /tmp/vault/tls.key /opt/vault/tls/tls.key"
+  - "chown vault:vault /opt/vault/tls/*"
+  - "mv /tmp/vault/vault.hcl /etc/vault.d/vault.hcl"
+  - "chown vault:vault /etc/vault.d/vault.hcl"
+  - "chown -R vault:vault ${persistent_mount}"
+  - "systemctl enable --now vault.service"
+  - "shutdown -r now"
