@@ -204,7 +204,7 @@ variable "cert_path" {
 variable "cloudinit_enabled" {
   type        = bool
   description = "(Optional) Enable cloudinit scripts supplied via `cloudinit_config_parts`.  Note that setting `volume_enabled` will execute a cloudinit script not enabled/disabled by this setting."
-  default     = true
+  default     = false
 }
 
 variable "cloudinit_config_parts" {
@@ -218,24 +218,41 @@ variable "cloudinit_config_parts" {
 
 # vault variables
 
-variable "tls_cert_b64" {
-  type = string
-}
-
-variable "tls_key_b64" {
-  type = string
-}
-
-variable "ca_cert_b64" {
-  type = string
-}
-
 variable "client_source_addresses" {
   type    = list(string)
   default = []
 }
 
+variable "tls_cert_b64" {
+  type    = string
+  default = null
+}
+
+variable "tls_key_b64" {
+  type    = string
+  default = null
+}
+
+variable "ca_cert_b64" {
+  type    = string
+  default = null
+}
+
 variable "https_port" {
   type    = string
   default = "8200"
+}
+
+variable "certbot_enabled" {
+  type = bool
+}
+
+variable "certbot_email" {
+  type    = string
+  default = "no-email"
+}
+
+variable "digitalocean_token" {
+  type    = string
+  default = "no-token"
 }
