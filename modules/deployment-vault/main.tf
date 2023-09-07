@@ -34,4 +34,15 @@ module "deployment" {
   volume_snapshot_most_recent = var.volume_snapshot_most_recent
   volume_snapshot_name        = var.volume_snapshot_name
   vpc_uuid                    = var.vpc_uuid
+
+  depends_on = [resource.null_resource.certbot_check]
+}
+
+resource "null_resource" "certbot_check" {
+  lifecycle {
+    precondition {
+      condition     = var.certbot_enabled && length(var.digitalocean_token) > 0
+      error_message = "If certbot is enabled, digital ocean token must be supplied"
+    }
+  }
 }

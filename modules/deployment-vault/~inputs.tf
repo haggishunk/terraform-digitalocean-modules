@@ -254,5 +254,5 @@ variable "certbot_email" {
 
 variable "digitalocean_token" {
   type    = string
-  default = "no-token"
+  default = ""
 }
