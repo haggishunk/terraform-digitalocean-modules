@@ -14,7 +14,8 @@ locals {
   ))
 
   # matches dns record hostname provided by `do/deployment` module
-  hostname = "${var.name}.${var.domain}"
+  hostname          = "${var.name}.${var.domain}"
+  hostname_internal = "${var.name}-internal.${var.domain}"
 
   cloudinit_config_parts = merge(
     var.cloudinit_config_parts,
@@ -46,6 +47,7 @@ locals {
             https_addr         = "0.0.0.0"
             api_addr           = "127.0.0.1"
             hostname           = local.hostname
+            hostname_internal  = local.hostname_internal
             digitalocean_token = var.digitalocean_token
             certbot_email      = var.certbot_email
           },
