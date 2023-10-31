@@ -1,76 +1,68 @@
+---
 #cloud-config
 write_files:
-
-  - path: /tmp/vault/vault.hcl
-    content: |
-      storage "file" {
-        path = "${persistent_mount}"
-      }
-      listener "tcp" {
-        address       = "${https_addr}:${https_port}"
-        tls_cert_file = "/etc/letsencrypt/live/${hostname}/fullchain.pem"
-        tls_key_file  = "/etc/letsencrypt/live/${hostname}/privkey.pem"
-      }
-      telemetry "prometheus" {
-        prometheus_retention_time = "12h"
-        disable_hostname          = true
-      }
-      mlock        = true
-      api_addr     = "http://${api_addr}:${https_port}"
-      ui           = true
-
-  - path: /etc/certbot/digitalocean.ini
-    permissions: '0400'
-    content: |
-      dns_digitalocean_token = ${digitalocean_token}
-
-  - path: /etc/crontab
-    append: true
-    content: |
-      22 07 * * *  root  certbot renew --dns-digitalocean --dns-digitalocean-credentials /etc/certbot/digitalocean.ini --non-interactive
-
+- path: /tmp/vault/vault.hcl
+  content: |
+    storage "file" {
+      path = "${persistent_mount}"
+    }
+    listener "tcp" {
+      address       = "${https_addr}:${https_port}"
+      tls_cert_file = "/etc/letsencrypt/live/${hostname}/fullchain.pem"
+      tls_key_file  = "/etc/letsencrypt/live/${hostname}/privkey.pem"
+    }
+    telemetry "prometheus" {
+      prometheus_retention_time = "12h"
+      disable_hostname          = true
+    }
+    mlock        = true
+    api_addr     = "http://${api_addr}:${https_port}"
+    ui           = true
+- path: /etc/certbot/digitalocean.ini
+  permissions: '0400'
+  content: |
+    dns_digitalocean_token = ${digitalocean_token}
+- path: /etc/crontab
+  append: true
+  content: |
+    22 07 * * *  root  certbot renew --dns-digitalocean --dns-digitalocean-credentials /etc/certbot/digitalocean.ini --non-interactive
 ntp:
   enabled: true
   ntp_client: chrony
-
 # enable when clean boot up & config is sorted out
 package_update: false
 package_upgrade: false
-
 packages:
-  - software-properties-common
-  - curl
-  - snapd
-
+- software-properties-common
+- curl
+- snapd
 runcmd:
-  # install certbot
-  - snap install --classic certbot
-  - sudo ln -s /snap/bin/certbot /usr/bin/certbot
-  - "snap set certbot trust-plugin-with-root=ok"
-  - "snap install certbot-dns-digitalocean"
-  # acquire a let's encrypt certificate
-  - "certbot certonly --dns-digitalocean --dns-digitalocean-credentials /etc/certbot/digitalocean.ini --domain ${hostname} --non-interactive --agree-tos --email ${certbot_email}"
-  - chmod -R 0755 /etc/letsencrypt/live
-  - chmod -R 0755 /etc/letsencrypt/archive
-  - "echo 'Certificates handled via certbot' > /root/README"
-  # install vault
-  - "curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -"
-  - 'apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"'
-  - "apt-get -y update"
-  - "apt-get -y install vault"
-  - "setcap cap_ipc_lock=+ep $(readlink -f $(which vault))"
-  # configure vault
-  - "mv /tmp/vault/vault.hcl /etc/vault.d/vault.hcl"
-  - "chown vault:vault /etc/vault.d/vault.hcl"
-  - "chown -R vault:vault ${persistent_mount}"
-  - "systemctl enable --now vault.service"
-
+# install certbot
+- snap install --classic certbot
+- sudo ln -s /snap/bin/certbot /usr/bin/certbot
+- "snap set certbot trust-plugin-with-root=ok"
+- "snap install certbot-dns-digitalocean"
+# acquire a let's encrypt certificate
+- "certbot certonly --dns-digitalocean --dns-digitalocean-credentials /etc/certbot/digitalocean.ini --domain ${hostname},${hostname_internal} --non-interactive --agree-tos --email ${certbot_email}"
+- chmod -R 0755 /etc/letsencrypt/live
+- chmod -R 0755 /etc/letsencrypt/archive
+- "echo 'Certificates handled via certbot' > /root/README"
+# install vault
+- "curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -"
+- 'apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"'
+- "apt-get -y update"
+- "apt-get -y install vault"
+- "setcap cap_ipc_lock=+ep $(readlink -f $(which vault))"
+# configure vault
+- "mv /tmp/vault/vault.hcl /etc/vault.d/vault.hcl"
+- "chown vault:vault /etc/vault.d/vault.hcl"
+- "chown -R vault:vault ${persistent_mount}"
+- "systemctl enable --now vault.service"
 power_state:
   delay: now
   mode: reboot
   message: Reboot for units to come up
   condition: true
-
 final_message: |
   cloud-init has finished setting up ${hostname}
   version: $version
