@@ -13,4 +13,6 @@ resource "digitalocean_droplet" "this" {
     local.ssh_tags,
     local.firewall_tags,
   )
+
+  lifecycle { ignore_changes = [user_data] }
 }
