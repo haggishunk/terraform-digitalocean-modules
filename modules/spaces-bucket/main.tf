@@ -47,3 +47,12 @@ resource "digitalocean_spaces_bucket" "this" {
     }
   }
 }
+
+resource "digitalocean_spaces_bucket_object" "ballast" {
+  for_each     = var.ballast ? toset(["enabled"]) : toset([])
+  region       = digitalocean_spaces_bucket.this.region
+  bucket       = digitalocean_spaces_bucket.this.name
+  key          = "__ballast__.json"
+  content      = jsonencode({ "ballast" = true })
+  content_type = "application/json"
+}
