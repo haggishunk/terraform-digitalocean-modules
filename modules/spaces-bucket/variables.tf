@@ -48,3 +48,7 @@ variable "lifecycle_rule" {
   default = null
 }
 
+variable "ballast" {
+  type        = bool
+  description = "Place an object in bucket for ballast"
+}
