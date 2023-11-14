@@ -50,5 +50,5 @@ variable "lifecycle_rule" {
 
 variable "ballast" {
   type        = bool
-  description = "Place an object in bucket for ballast"
+  description = "Place an object in bucket for ballast.  Some read operations will fail with an empty bucket."
 }
